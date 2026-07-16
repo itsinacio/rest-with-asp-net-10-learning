@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "dgSpecHash": "26E6Mz5kDHA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\user\\Documents\\ProjetoDeEstudosCSharp\\04_RestWithASPNET10Erudio_ScaffoldViaTerminal\\RestWithASPNET10Erudio\\RestWithASPNET10Erudio\\RestWithASPNET10Erudio.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.9\\microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
+    "C:\\Users\\user\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "O pacote 'Microsoft.OpenApi' 2.0.0 tem uma alta vulnerabilidade de gravidade conhecida, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
+      "projectPath": "C:\\Users\\user\\Documents\\ProjetoDeEstudosCSharp\\04_RestWithASPNET10Erudio_ScaffoldViaTerminal\\RestWithASPNET10Erudio\\RestWithASPNET10Erudio\\RestWithASPNET10Erudio.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\user\\Documents\\ProjetoDeEstudosCSharp\\04_RestWithASPNET10Erudio_ScaffoldViaTerminal\\RestWithASPNET10Erudio\\RestWithASPNET10Erudio\\RestWithASPNET10Erudio.csproj",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
