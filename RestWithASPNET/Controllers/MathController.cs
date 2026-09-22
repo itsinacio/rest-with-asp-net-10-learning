@@ -6,7 +6,7 @@ using System;
 using RestWithASPNET.Utils;
 using RestWithASPNET.Services;
 
-namespace RestWithASPNET.Namespace
+namespace RestWithASPNET.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
