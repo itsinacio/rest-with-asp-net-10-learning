@@ -1,42 +1,46 @@
 ﻿using RestWithASPNET.Model;
+using RestWithASPNET.Model.Context;
 namespace RestWithASPNET.Services.Impl;
 
 public class PersonServiceImpl : IPersonServices
 {
-    private Person mockPerson(int i,string firstName = "Jhon",string secondName = "Ninhares", int age = 18 , string cpf = "177.671.888-90", char gender = 'M')
+    private MSSQLContext _context;
+    public PersonServiceImpl(MSSQLContext context)
     {
-        var person = new Person{Id = new Random().Next(1,1000), FirstName = firstName + i,SecondName = secondName + i, Age = age, Cpf = cpf, Gender = gender };
-        return person;
+        _context = context;
     }
+
     public Person Create(Person person)
     {
-        person.Id = new Random().Next(1,1000);
+        _context.Add(person);
+        _context.SaveChanges();
         return person;
     }
 
     public Person FindById(long Id)
     {
-        var person = mockPerson((int)Id);
-        return person;
+        return _context.Persons.Find(Id);
     }
 
     public List<Person> FindAll()
     {
-        List<Person> persons = new List<Person>();
-        for(int i = 0; i < 10; i++)
-        {
-            persons.Add(mockPerson(i));
-        }
-        return persons;
+        return _context.Persons.ToList();
     }
 
     public Person Update(Person person)
     {
+        var existingPerson = _context.Persons.Find(person.Id);
+        if(existingPerson == null) return null;
+        _context.Entry(existingPerson).CurrentValues.SetValues(person);
+        _context.SaveChanges();
         return person;
     }
 
     public void Delete(long id)
     {
-        // Logica de deleção
+        var existingPerson = _context.Persons.Find(id);
+        if(existingPerson == null) return ;
+        _context.Remove(existingPerson);
+        _context.SaveChanges();
     }
 }
