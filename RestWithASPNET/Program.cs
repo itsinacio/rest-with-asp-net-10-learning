@@ -1,3 +1,4 @@
+using RestWithASPNET.Configurations;
 using RestWithASPNET.Services;
 using RestWithASPNET.Services.Impl;
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.addDataBaseConfiguration(builder.Configuration);
 builder.Services.AddSingleton<MathService>();
 builder.Services.AddScoped<IPersonServices,PersonServiceImpl>();
 
