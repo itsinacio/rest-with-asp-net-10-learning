@@ -1,4 +1,6 @@
 using RestWithASPNET.Configurations;
+using RestWithASPNET.Repositories;
+using RestWithASPNET.Repositories.Impl;
 using RestWithASPNET.Services;
 using RestWithASPNET.Services.Impl;
 
@@ -12,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.addDataBaseConfiguration(builder.Configuration);
 builder.Services.AddSingleton<MathService>();
 builder.Services.AddScoped<IPersonServices,PersonServiceImpl>();
+builder.Services.AddScoped<IPersonRepository,PersonRepositoryImpl>();
 
 builder.Services.AddOpenApi();
 
