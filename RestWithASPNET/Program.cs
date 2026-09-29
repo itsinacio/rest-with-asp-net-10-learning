@@ -4,6 +4,7 @@ using RestWithASPNET.Services.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.addSerilogLogging();
 // Add services to the container.
 
 builder.Services.AddControllers();
