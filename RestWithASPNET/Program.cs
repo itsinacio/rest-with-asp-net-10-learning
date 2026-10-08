@@ -15,9 +15,8 @@ builder.Services.addDataBaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration,builder.Environment);
 builder.Services.AddSingleton<MathService>();
 builder.Services.AddScoped<IPersonServices,PersonServiceImpl>();
-builder.Services.AddScoped<IPersonRepository,PersonRepositoryImpl>();
 builder.Services.AddScoped<IBookServices,BookServiceImpl>();
-builder.Services.AddScoped<IBookRepository,BookRepositoryImpl>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddOpenApi();
 
