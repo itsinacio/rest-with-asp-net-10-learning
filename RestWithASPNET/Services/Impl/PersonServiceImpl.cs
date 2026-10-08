@@ -4,8 +4,8 @@ namespace RestWithASPNET.Services.Impl;
 
 public class PersonServiceImpl : IPersonServices
 {
-    private IPersonRepository _repository;
-    public PersonServiceImpl(IPersonRepository repository)
+    private IRepository<Person> _repository;
+    public PersonServiceImpl(IRepository<Person> repository)
     {
         _repository = repository;
     }

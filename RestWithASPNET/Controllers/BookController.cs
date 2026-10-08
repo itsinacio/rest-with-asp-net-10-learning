@@ -28,13 +28,13 @@ namespace RestWithASPNET.Controllers
         public IActionResult Get(long id)
         {
             _logger.LogInformation("Fetching book with ID: {id}", id);
-            var person = _bookService.FindById(id);
-            if (person == null)
+            var Boook = _bookService.FindById(id);
+            if (Boook == null)
             {
                 _logger.LogWarning("Book with ID {id} not found", id);
                 return NotFound();
             }
-            return Ok(person);
+            return Ok(Boook);
         }
 
         [HttpPost]
