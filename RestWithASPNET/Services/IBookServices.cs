@@ -1,5 +1,4 @@
-﻿using RestWithASPNET.Data.DTO;
-using RestWithASPNET.Model;
+﻿using RestWithASPNET.Data.DTO.V1;
 
 namespace RestWithASPNET.Services;
 

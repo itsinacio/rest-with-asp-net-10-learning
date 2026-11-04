@@ -1,4 +1,4 @@
-﻿namespace RestWithASPNET.Data.DTO;
+﻿namespace RestWithASPNET.Data.DTO.V1;
 public class BookDTO 
 {
     public long Id {get; set;}

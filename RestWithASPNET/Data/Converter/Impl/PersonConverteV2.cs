@@ -1,0 +1,48 @@
+﻿using RestWithASPNET.Data.Converter.Contract;
+using RestWithASPNET.Model;
+using RestWithASPNET.Data.DTO.V2;
+
+namespace RestWithASPNET.Data.Converter.Impl;
+
+public class PersonConverterV2: IParser<PersonDTO, Person> , IParser<Person, PersonDTO>
+{
+    public Person Parse(PersonDTO origin)
+    {
+        if(origin == null) return null;
+        return new Person
+        {
+            Id = origin.Id,
+            FirstName = origin.FirstName,
+            SecondName = origin.SecondName,
+            Age = origin.Age,
+            Cpf = origin.Cpf,
+            Gender = origin.Gender,
+            // BirthDay = origin.Birthday
+        };
+    }
+    public List<Person> ParseList(List<PersonDTO> origin)
+    {
+        if(origin == null) return null;
+        return origin.Select(item => Parse(item)).ToList();
+    }
+
+    public PersonDTO Parse(Person origin)
+    {
+        if(origin == null) return null;
+        return new PersonDTO
+        {
+            Id = origin.Id,
+            FirstName = origin.FirstName,
+            SecondName = origin.SecondName,
+            Age = origin.Age,
+            Cpf = origin.Cpf,
+            Gender = origin.Gender,
+            Birthday = DateTime.Now
+        };
+    }
+    public List<PersonDTO> ParseList(List<Person> origin)
+    {
+        if(origin == null) return null;
+        return origin.Select(item => Parse(item)).ToList();
+    }
+}
