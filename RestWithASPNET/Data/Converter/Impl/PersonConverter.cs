@@ -1,6 +1,6 @@
-﻿using RestWithASPNET.Data.DTO;
-using RestWithASPNET.Data.Converter.Contract;
+﻿using RestWithASPNET.Data.Converter.Contract;
 using RestWithASPNET.Model;
+using RestWithASPNET.Data.DTO.V1;
 
 namespace RestWithASPNET.Data.Converter.Impl;
 

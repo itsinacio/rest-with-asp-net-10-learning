@@ -1,4 +1,4 @@
-﻿using RestWithASPNET.Data.DTO;
+﻿using RestWithASPNET.Data.DTO.V1;
 namespace RestWithASPNET.Services;
 
 public interface IPersonServices

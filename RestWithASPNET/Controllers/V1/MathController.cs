@@ -1,12 +1,10 @@
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RestWithASPNET.Model;
-using System;
 using RestWithASPNET.Utils;
 using RestWithASPNET.Services;
 
-namespace RestWithASPNET.Controllers
+namespace RestWithASPNET.Controllers.V1
 {
     [ApiController]
     [Route("api/[controller]")]

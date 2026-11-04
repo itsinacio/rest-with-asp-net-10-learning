@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RestWithASPNET.Data.DTO;
-using RestWithASPNET.Model;
+using RestWithASPNET.Data.DTO.V1;
 using RestWithASPNET.Services;
 
-namespace RestWithASPNET.Controllers
+namespace RestWithASPNET.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/v1")]
     [ApiController]
     public class BookController : ControllerBase
     {
@@ -22,6 +21,8 @@ namespace RestWithASPNET.Controllers
         public IActionResult Get()
         {
             _logger.LogInformation("Fetching all books");
+            Response.Headers.Append("X-API-Deprecated", "true");
+            Response.Headers.Append("X-API-Deprecated-Date", "2026-11-03");
             return Ok(_bookService.FindAll());
         }
 
