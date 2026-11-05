@@ -13,7 +13,6 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.addDataBaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration,builder.Environment);
-builder.Services.AddSingleton<MathService>();
 builder.Services.AddScoped<IPersonServices,PersonServiceImpl>();
 builder.Services.AddScoped<IBookServices,BookServiceImpl>();
 builder.Services.AddScoped<PersonServiceImplV2>();
