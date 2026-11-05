@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.addSerilogLogging();
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddContentNegotiation();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.addDataBaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration,builder.Environment);
