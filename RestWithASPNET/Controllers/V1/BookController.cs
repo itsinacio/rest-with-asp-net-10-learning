@@ -18,6 +18,9 @@ namespace RestWithASPNET.Controllers.V1
         }
 
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(List<BookDTO>))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public IActionResult Get()
         {
             _logger.LogInformation("Fetching all books");
@@ -27,6 +30,9 @@ namespace RestWithASPNET.Controllers.V1
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(BookDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public IActionResult Get(long id)
         {
             _logger.LogInformation("Fetching book with ID: {id}", id);
@@ -40,6 +46,9 @@ namespace RestWithASPNET.Controllers.V1
         }
 
         [HttpPost]
+        [ProducesResponseType(200, Type = typeof(BookDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public IActionResult Post([FromBody] BookDTO book)
         {
             _logger.LogInformation("Create new book: {Title}", book.Title);
@@ -53,6 +62,9 @@ namespace RestWithASPNET.Controllers.V1
         }
 
         [HttpPut]
+        [ProducesResponseType(200, Type = typeof(BookDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public IActionResult Put([FromBody] BookDTO book)
         {
             _logger.LogInformation("Updating Book with id: {id}", book.Id);
@@ -67,6 +79,9 @@ namespace RestWithASPNET.Controllers.V1
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(204, Type = typeof(BookDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public IActionResult Delete(long id)
         {
             _logger.LogInformation("Deleting Book with id: {id}", id);

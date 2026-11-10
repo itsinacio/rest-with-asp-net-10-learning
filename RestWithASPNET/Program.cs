@@ -11,6 +11,10 @@ builder.addSerilogLogging();
 
 builder.Services.AddControllers().AddContentNegotiation();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenAPIConfig();
+builder.Services.AddSwaggerConfig();
+builder.Services.AddRouteConfig();
 builder.Services.addDataBaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration,builder.Environment);
 builder.Services.AddScoped<IPersonServices,PersonServiceImpl>();
@@ -33,5 +37,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseSwaggerSpecification();
+
+app.UseScalarConfiguration();
 
 app.Run();
