@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dockerizando uma Aplicação ASP.NET 10</title>
+  <link rel="icon" href="https://github.com/leandrocgsi/blog-images/blob/main/logos/favicon-16x16-1.png?raw=true" sizes="32x32" />
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9; color:#1f2937; line-height:1.7; }
+    header { background:#363636; border-bottom:1px solid #e5e7eb; }
+    .header-content { max-width:800px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; padding:20px; }
+    .logo img, .stars img { max-width:200px; height:auto; }
+    main { max-width:800px; margin:40px auto; padding:30px 20px; background:#fff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    h1 { color:#111827; font-size:28px; margin-bottom:20px; text-align:center; }
+    h2 { margin-top:30px; color:#111827; }
+    h3 { margin-top:20px; color:#111827; font-size:18px; }
+    p { margin-bottom:18px; text-align:justify; }
+    ul, ol { margin:16px 0 16px 24px; }
+    li { margin-bottom:10px; }
+    .highlight { background:#f3f4f6; padding:15px; border-left:4px solid #16a34a; border-radius:4px; }
+    .code-block { background:#1f2937; color:#f9fafb; padding:20px; border-radius:6px; overflow-x:auto; font-family:'Courier New', monospace; font-size:14px; line-height:1.6; margin:20px 0; }
+    .code-block code { display:block; white-space:pre; }
+    .link-button { display:inline-block; margin:12px 8px 0 0; padding:10px 20px; background:#2563eb; color:#fff; border-radius:6px; text-decoration:none; font-size:15px; transition:background .3s; }
+    .link-button:hover { background:#1d4ed8; }
+    .course-banner { text-align:center; margin:40px 0 20px 0; }
+    .course-banner img { border-radius:8px; box-shadow:0 3px 8px rgba(0,0,0,0.15); transition:transform .3s; }
+    .course-banner img:hover { transform:scale(1.02); }
+    footer { text-align:center; padding:40px 20px; background:#fff; margin-top:60px; border-top:1px solid #e5e7eb; }
+    .social-icons { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; padding-top:30px; }
+    .social-icons a { width:52px; height:52px; background:#fff; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.15); display:flex; align-items:center; justify-content:center; transition:transform .2s; text-decoration:none; }
+    .social-icons a:hover { transform:translateY(-2px); }
+    .social-icons img { max-width:36px; max-height:36px; }
+    #copyright-text { text-align:center; margin-top:25px; color:#4b5563; font-size:14px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-content">
+    <div class="logo"><a href="https://pub.erudio.com.br/kr/premium_courses"><img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/cropped-teste_logo-2.png?raw=true" alt="Erudio Training"></a></div>
+    <div class="stars"><img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/five_stars.png?raw=true" alt="Cinco Estrelas"></div>
+  </div>
+</header>
+
+<main>
+  <h1>Dockerizando uma Aplicação ASP.NET 10</h1>
+
+  <p>Dockerizar uma aplicação ASP.NET representa um dos casos de uso mais comuns em ambientes corporativos modernos. O processo envolve criar um Dockerfile que não apenas empacota a aplicação, mas também otimiza o tamanho da imagem final e garante que apenas os artefatos necessários para execução estejam presentes no ambiente de produção. Nesta aula, exploraremos o passo a passo completo para containerizar uma aplicação ASP.NET 10, utilizando a técnica de multistage build para maximizar eficiência e segurança.</p>
+
+  <h2>1. Pré-requisitos</h2>
+  <p>Antes de iniciar o processo de dockerização, certifique-se de ter instalado:</p>
+  <ul>
+    <li>Docker Desktop ou Docker Engine (versão 20.10 ou superior)</li>
+    <li>.NET SDK 10.0-preview (para desenvolvimento local, se necessário)</li>
+    <li>Visual Studio 2022, Visual Studio Code ou qualquer editor de sua preferência</li>
+    <li>Uma aplicação ASP.NET 10 funcional (pode ser criada com <strong>dotnet new webapi</strong>)</li>
+  </ul>
+
+  <h2>2. Estrutura do projeto</h2>
+  <p>Para este exemplo, utilizamos uma estrutura completa de projeto ASP.NET com separação de responsabilidades:</p>
+  <div class="code-block"><code>01-Before/
+│   HelloDocker.sln
+│   Dockerfile
+│
+└───HelloDocker/
+    │   appsettings.Development.json
+    │   appsettings.json
+    │   HelloDocker.csproj
+    │   HelloDocker.http
+    │   Program.cs
+    │
+    ├───Controllers/
+    │       DockerController.cs
+    │
+    ├───Model/
+    │       HelloDocker.cs
+    │
+    ├───Properties/
+    │       launchSettings.json
+    │
+    └───Services/
+            InstanceInformationService.cs</code></div>
+  <p>O Dockerfile deve ser posicionado na raiz da solução, um nível acima do diretório do projeto, para que o contexto de build inclua todos os arquivos necessários. Esta estrutura segue o padrão recomendado para aplicações ASP.NET, com separação clara entre controladores, modelos e serviços.</p>
+
+  <h2>3. Criando o Dockerfile</h2>
+  <p>O Dockerfile a seguir utiliza a técnica de multistage build, separando as etapas de compilação e execução em diferentes estágios. Isso garante que a imagem final contenha apenas o runtime necessário, sem ferramentas de desenvolvimento ou código-fonte:</p>
+
+  <div class="code-block"><code># Stage 1: Base - Imagem runtime para execução
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 80
+
+# Stage 2: Build - Imagem SDK para compilação
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["HelloDocker/HelloDocker.csproj", "HelloDocker/"]
+RUN dotnet restore "./HelloDocker/HelloDocker.csproj"
+COPY . .
+WORKDIR "/src/HelloDocker"
+RUN dotnet build "./HelloDocker.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Stage 3: Publish - Publicação dos artefatos
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./HelloDocker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# Stage 4: Final - Imagem final otimizada
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "HelloDocker.dll"]</code></div>
+
+  <h2>4. Entendendo o Multistage Build</h2>
+  <p>O multistage build é uma técnica fundamental para criar imagens Docker otimizadas. Ao invés de incluir todo o SDK e ferramentas de compilação na imagem final, separamos o processo em etapas distintas, cada uma com sua responsabilidade específica. Isso resulta em imagens significativamente menores e mais seguras.</p>
+
+  <h3>4.1. Stage 1: Base (Imagem Runtime)</h3>
+  <p>O primeiro estágio utiliza a imagem <strong>mcr.microsoft.com/dotnet/aspnet:10.0-preview</strong>, que contém apenas o runtime ASP.NET necessário para executar aplicações. Esta imagem não inclui o SDK ou ferramentas de compilação, tornando-a muito mais leve. A instrução <strong>USER $APP_UID</strong> configura o contêiner para executar com um usuário não-root, aumentando a segurança. A porta 80 é exposta através da instrução EXPOSE, indicando que a aplicação escutará requisições HTTP nesta porta.</p>
+
+  <h3>4.2. Stage 2: Build (Compilação)</h3>
+  <p>O segundo estágio utiliza a imagem <strong>mcr.microsoft.com/dotnet/sdk:10.0-preview</strong>, que contém todas as ferramentas necessárias para compilar aplicações .NET. O argumento <strong>BUILD_CONFIGURATION</strong> permite definir o perfil de build (Release ou Debug) durante a construção da imagem. Primeiro, apenas o arquivo .csproj é copiado e o comando <strong>dotnet restore</strong> é executado. Esta estratégia aproveita o cache de camadas do Docker: se as dependências não mudarem, esta camada será reutilizada em builds subsequentes, acelerando significativamente o processo. Após o restore, todo o código-fonte é copiado e o comando <strong>dotnet build</strong> compila a aplicação.</p>
+
+  <h3>4.3. Stage 3: Publish (Publicação)</h3>
+  <p>O terceiro estágio herda do estágio de build e executa o comando <strong>dotnet publish</strong>. Este comando gera os artefatos otimizados para produção, removendo símbolos de debug e aplicando otimizações de runtime. O parâmetro <strong>/p:UseAppHost=false</strong> instrui o .NET a não criar um executável nativo, já que utilizaremos o comando <strong>dotnet</strong> para iniciar a aplicação. Os artefatos publicados são colocados em <strong>/app/publish</strong>.</p>
+
+  <h3>4.4. Stage 4: Final (Imagem de Produção)</h3>
+  <p>O último estágio retorna à base image (runtime apenas) e copia os artefatos publicados do estágio anterior usando <strong>COPY --from=publish</strong>. Esta instrução permite copiar arquivos de um estágio nomeado para outro, que é a essência do multistage build. A imagem final contém apenas o runtime ASP.NET e os binários compilados da aplicação, sem código-fonte, ferramentas de build ou dependências de desenvolvimento. O <strong>ENTRYPOINT</strong> define o comando que será executado quando o contêiner iniciar: <strong>dotnet HelloDocker.dll</strong>.</p>
+
+  <h2>5. Vantagens do Multistage Build</h2>
+  <ul>
+    <li><strong>Tamanho reduzido:</strong> A imagem final pode ser até 10 vezes menor que uma imagem que inclui o SDK completo.</li>
+    <li><strong>Segurança aprimorada:</strong> Sem ferramentas de compilação ou código-fonte na imagem de produção, a superfície de ataque é drasticamente reduzida.</li>
+    <li><strong>Cache eficiente:</strong> Separar o restore das dependências do build do código permite que o Docker reutilize camadas quando apenas o código muda.</li>
+    <li><strong>Separação de responsabilidades:</strong> Cada estágio tem um propósito claro, facilitando manutenção e debugging.</li>
+  </ul>
+
+  <h2>6. Análise detalhada das instruções</h2>
+  
+  <h3>6.1. FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS base</h3>
+  <p>Define a base image para o runtime. O sufixo <strong>AS base</strong> nomeia este estágio para referência posterior. A Microsoft mantém imagens oficiais otimizadas no Microsoft Container Registry (mcr.microsoft.com).</p>
+
+  <h3>6.2. USER $APP_UID</h3>
+  <p>Configura o contêiner para executar com um usuário específico ao invés de root. A variável <strong>$APP_UID</strong> é definida automaticamente pela base image da Microsoft, seguindo práticas de segurança recomendadas.</p>
+
+  <h3>6.3. WORKDIR /app</h3>
+  <p>Define o diretório de trabalho dentro do contêiner. Todos os comandos subsequentes serão executados neste diretório, e será também o diretório padrão quando o contêiner iniciar.</p>
+
+  <h3>6.4. EXPOSE 80</h3>
+  <p>Documenta que a aplicação escutará na porta 80. Esta instrução é informativa e não publica a porta automaticamente — isso deve ser feito com o parâmetro <strong>-p</strong> no comando docker run.</p>
+
+  <h3>6.5. ARG BUILD_CONFIGURATION=Release</h3>
+  <p>Define um argumento de build com valor padrão. Este argumento pode ser sobrescrito durante o build usando <strong>--build-arg BUILD_CONFIGURATION=Debug</strong>.</p>
+
+  <h3>6.6. COPY ["HelloDocker/HelloDocker.csproj", "HelloDocker/"]</h3>
+  <p>Copia apenas o arquivo de projeto antes de copiar o código-fonte. Esta estratégia otimiza o cache: se as dependências (definidas no .csproj) não mudarem, o Docker reutilizará a camada do restore.</p>
+
+  <h3>6.7. RUN dotnet restore</h3>
+  <p>Restaura todas as dependências NuGet definidas no arquivo de projeto. Esta operação pode ser demorada, mas é executada apenas quando o .csproj muda.</p>
+
+  <h3>6.8. COPY . .</h3>
+  <p>Copia todo o código-fonte do contexto de build para dentro do contêiner. É executado após o restore para maximizar a eficiência do cache.</p>
+
+  <h3>6.9. RUN dotnet build</h3>
+  <p>Compila a aplicação no modo especificado por BUILD_CONFIGURATION. Os binários compilados são colocados em <strong>/app/build</strong>.</p>
+
+  <h3>6.10. RUN dotnet publish</h3>
+  <p>Gera os artefatos otimizados para produção, aplicando tree shaking, ahead-of-time compilation quando aplicável, e removendo símbolos de debug.</p>
+
+  <h3>6.11. COPY --from=publish /app/publish .</h3>
+  <p>Esta é a instrução que materializa o multistage build. Copia os artefatos do estágio "publish" para o estágio final, sem trazer as camadas intermediárias.</p>
+
+  <h3>6.12. ENTRYPOINT ["dotnet", "HelloDocker.dll"]</h3>
+  <p>Define o comando que será executado quando o contêiner iniciar. Utiliza o formato exec (array JSON) que é preferível ao formato shell, pois permite que sinais do sistema operacional sejam tratados corretamente.</p>
+
+  <h2>7. Próximos passos</h2>
+
+  <p><strong>Se você quer realmente dominar o Docker e aplicá-lo com segurança em projetos reais</strong>, vale a pena ir além. O curso <a href="https://pub.erudio.com.br/kr/blog_docker" target="_blank" rel="noopener"><em>Docker e Kubernetes do 0 à Maestria: Contêineres Desmistificados</em></a> foi desenvolvido justamente para te levar do nível iniciante à prática profissional, com foco total em aplicações reais, ambientes modernos e integração com tecnologias amplamente usadas no mercado.</p>
+
+  <p>Ao longo do curso, você entenderá por que o Docker se tornou uma habilidade essencial nas áreas de desenvolvimento e infraestrutura, e como ele pode elevar o desempenho e a portabilidade das suas aplicações. É o passo seguinte natural para quem quer se destacar e conquistar novas oportunidades.</p>
+
+  <div class="course-banner" style="margin-top: 25px; display: flex; justify-content: center;">
+    <a href="https://pub.erudio.com.br/kr/blog_docker" target="_blank" rel="noopener" style="display: block; width: 100%; max-width: 800px; border-radius: 10px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); transition: transform 0.2s ease;">
+      <img decoding="async" src="https://raw.githubusercontent.com/leandrocgsi/blog-images/main/09-docker.png" alt="Docker do 0 à Maestria: Contêineres Desmistificados mais 3 BÔNUS" title="Docker do 0 à Maestria: Contêineres Desmistificados mais 3 BÔNUS" style="width: 100%; height: auto; display: block;">
+    </a>
+  </div>
+
+  <h2>8. Referências e leitura recomendada</h2>
+  <div style="margin-top:16px;">
+    <a href="https://docs.docker.com/build/building/multi-stage/" target="_blank" class="link-button">Multi-stage builds — Docker Docs</a>
+    <a href="https://learn.microsoft.com/en-us/dotnet/core/docker/build-container" target="_blank" class="link-button">Dockerize a .NET app — Microsoft Learn</a>
+    <a href="https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/docker/" target="_blank" class="link-button">Host ASP.NET Core in Docker — Microsoft</a>
+    <a href="https://hub.docker.com/_/microsoft-dotnet-aspnet/" target="_blank" class="link-button">.NET Runtime Images — Docker Hub</a>
+  </div>
+
+  <h2>9. Conclusão</h2>
+  <p>Dockerizar uma aplicação ASP.NET 10 utilizando multistage build representa a melhor prática atual para criar imagens otimizadas, seguras e prontas para produção. Ao separar as etapas de compilação e execução, conseguimos reduzir drasticamente o tamanho da imagem final, eliminar ferramentas desnecessárias e melhorar a segurança geral da aplicação. Compreender cada estágio do Dockerfile e o propósito de cada instrução é fundamental para dominar a containerização de aplicações .NET. Nas próximas aulas, exploraremos como construir essa imagem e executar o contêiner na prática.</p>
+
+</main>
+
+<footer>
+  <div class="social-icons">
+    <a href="https://www.youtube.com/@erudiotraining" target="_blank" aria-label="YouTube">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/youtube_logo_min.png?raw=true" alt="YouTube" />
+    </a>
+    <a href="https://www.linkedin.com/company/erudiotraining" target="_blank" aria-label="LinkedIn">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/linkedin_logo_min.png?raw=true" alt="LinkedIn" />
+    </a>
+    <a href="https://github.com/leandrocgsi" target="_blank" aria-label="GitHub">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/github_logo_min.png?raw=true" alt="GitHub" />
+    </a>
+    <a href="https://pub.erudio.com.br/kr/premium_courses" target="_blank" aria-label="Udemy">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/udemy_logo.png?raw=true" alt="Udemy" />
+    </a>
+    <a href="https://www.instagram.com/erudiotraining" target="_blank" aria-label="Instagram">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/instagram.png?raw=true" alt="Instagram" />
+    </a>
+    <a href="https://www.facebook.com/erudiotraining" target="_blank" aria-label="Facebook">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/facebook.png?raw=true" alt="Facebook" />
+    </a>
+    <a href="https://www.threads.net/@erudiotraining" target="_blank" aria-label="Threads">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/threads.png?raw=true" alt="Threads" />
+    </a>
+    <a href="https://www.tiktok.com/@erudiotraining" target="_blank" aria-label="TikTok">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/tiktok.png?raw=true" alt="TikTok" />
+    </a>
+    <a href="https://x.com/erudiotraining" target="_blank" aria-label="X">
+      <img src="https://github.com/leandrocgsi/blog-images/blob/main/logos/twitter.png?raw=true" alt="X (Twitter)" />
+    </a>
+  </div>
+
+  <p id="copyright-text">
+    © Copyright - Erudio Training - 2011-<span id="current-year"></span> - CNPJ: 34.523.711/0001-62 - Todos os Direitos Reservados
+  </p>
+
+  <script>
+    document.getElementById("current-year").textContent = new Date().getFullYear();
+  </script>
+</footer>
+</body>
+</html>
