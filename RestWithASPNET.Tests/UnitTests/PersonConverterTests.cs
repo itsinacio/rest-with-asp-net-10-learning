@@ -3,7 +3,7 @@ using RestWithASPNET.Data.Converter.Impl;
 using RestWithASPNET.Data.DTO.V2;
 using RestWithASPNET.Model;
 
-namespace RestWithASPNET.Tests;
+namespace RestWithASPNET.Tests.UnitTests;
 
 public class PersonConverterTests
 {

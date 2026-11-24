@@ -17,14 +17,7 @@ public static class EvolveConfig
             if (string.IsNullOrEmpty(conectionString)) throw new ArgumentNullException("Connection string 'MSSQLServerSQLConnectionString' not found");
             try
             {
-                using var evolveConnection = new SqlConnection(conectionString);
-                var evolve = new Evolve(
-                    evolveConnection,
-                    msg => Log.Information(msg)){
-                Locations = new List<string> {"db/migrations","db/dataset"},
-                IsEraseDisabled = true
-                    };
-                evolve.Migrate();
+                ExecuteMigrations(conectionString);
             }
             catch(Exception ex)
             {
@@ -32,7 +25,17 @@ public static class EvolveConfig
                 throw;            
             }
         }
-
         return services;
+    }
+    public static void ExecuteMigrations(string ConectionString)
+    {
+        using var evolveConnection = new SqlConnection(ConectionString);
+        var evolve = new Evolve(
+            evolveConnection,
+            msg => Log.Information(msg)){
+            Locations = new List<string> {"db/migrations","db/dataset"},
+            IsEraseDisabled = true
+            };
+        evolve.Migrate();
     }
 }
